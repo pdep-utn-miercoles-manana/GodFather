@@ -261,3 +261,19 @@ object donCorleone inherits Don {
 		super(unAtacante, unAtacado)
 	}
 }
+
+
+class Traicion {
+	const traidor
+	const victimas = #{}
+	
+	const fechaTentativa
+	
+	method ajusticiar() {
+		// Esto se lo dejo a ustedes, es fácil
+	}
+
+	method concretarse() {
+		// Esto se lo dejo a ustedes, es fácil
+	}
+}
