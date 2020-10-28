@@ -3,15 +3,22 @@ class Integrante {
 	
 	const armas = #{}
 	
-	var estaHerido
-	var estaMuerto
-	
+	var estaMuerto = false
+
 	method estaDurmiendoConLosPeces() {
 		return estaMuerto
 	}
 	
 	method cantidadArmas() {
 		return armas.size()
+	}
+	
+	method armarse() {
+		self.agregarArma(new Pistola(cantidadBalas = 6))
+	}
+	
+	method agregarArma(unArma) {
+		armas.add(unArma)
 	}
 	
 }
@@ -24,5 +31,12 @@ class Familia {
 		return integrantes.max { integrante => integrante.cantidadArmas() }
 	}
 	
+	method armarFamilia() {
+		integrantes.forEach { integrante => integrante.armarse() }
+	}
 }
 
+
+class Pistola {
+	var cantidadBalas
+}
