@@ -4,6 +4,7 @@ class Integrante {
 	const armas = #{}
 	
 	var estaMuerto = false
+	var rango = new Soldado()
 
 	method estaDurmiendoConLosPeces() {
 		return estaMuerto
@@ -14,11 +15,19 @@ class Integrante {
 	}
 	
 	method armarse() {
-		self.agregarArma(new Pistola(cantidadBalas = 6))
+		self.agregarArma(new Revolver(cantidadBalas = 6))
 	}
 	
 	method agregarArma(unArma) {
 		armas.add(unArma)
+	}
+	
+	method sabeDespacharElegantemente() {
+		return rango.sabeDespacharElegantemente(self)
+	}
+	
+	method tieneArmaSutil() {
+		return armas.any { arma => arma.esSutil() }
 	}
 	
 }
@@ -37,6 +46,42 @@ class Familia {
 }
 
 
-class Pistola {
+class Revolver {
 	var cantidadBalas
+	
+	method esSutil() {
+		return cantidadBalas == 1
+	}
+}
+
+class CuerdaDePiano {
+	method esSutil() {
+		return true
+	}
+}
+
+class Escopeta {
+	method esSutil() {
+		return false
+	}
+}
+
+class Don {
+	method sabeDespacharElegantemente(unaPersona) {
+		return true
+	}
+}
+
+class Subjefe {
+	const subordinados = #{}
+	
+	method sabeDespacharElegantemente(unaPersona) {
+		return subordinados.any { subordinado => subordinado.tieneArmaSutil() }
+	}
+}
+
+class Soldado {
+	method sabeDespacharElegantemente(unaPersona) {
+		return unaPersona.tieneArmaSutil()
+	}
 }
