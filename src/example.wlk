@@ -6,6 +6,7 @@ class Integrante {
 	var estaMuerto = false
 	
 	var rango = new Soldado()
+	var lealtad
 
 	method estaDurmiendoConLosPeces() {
 		return estaMuerto
@@ -34,7 +35,7 @@ class Integrante {
 	method atacarFamilia(unaFamilia) {
 		const atacado = unaFamilia.mafiosoMasPeligroso()
 		if (atacado.estaVivo()) {
-			self.atacar(atacado)
+			self.atacarIntegrante(atacado)
 		}
 	}
 
@@ -42,7 +43,7 @@ class Integrante {
 		return not estaMuerto
 	}
 
-	method atacar(unaPersona) {
+	method atacarIntegrante(unaPersona) {
 		rango.atacar(self, unaPersona)
 	}
 
@@ -66,11 +67,37 @@ class Integrante {
 		}
 	}
 
+	method ascenderASubjefe() {
+		rango = new Subjefe()
+	}
+	
+	method esSoldado() {
+		return rango.esSoldado()
+	}
+	
+	method ascenderADonDe(unaFamilia) {
+		rango = new Don(subordinados = self.subordinados())
+		unaFamilia.ascenderADon(self)
+	}
+	
+	method subordinados() {
+		return rango.subordinados()
+	}
+	
+	method aumentarLealtadPorLuto() {
+		lealtad *= 1.1
+	}
+	
+	method lealtad() {
+		return lealtad
+	}
+	
 }
 
 class Familia {
 
-	const integrantes = #{}
+	const integrantes = []
+	var don
 
 	method mafiosoMasPeligroso() {
 		return self.integrantesVivos().max{ integrante => integrante.cantidadArmas() }
@@ -86,6 +113,35 @@ class Familia {
 	
 	method integrantesVivos() {
 		return integrantes.filter { integrante => integrante.estaVivo() }
+	}
+	
+	method reorganizarse() {
+		self.ascenderSoldadosConArmas()
+		self.elegirNuevoDon()
+		self.aumentarLealtad()
+	}
+
+	method ascenderSoldadosConArmas() {
+		self.soldadosVivos()
+			.sortBy { int1, int2 => int1.cantidadArmas() > int2.cantidadArmas() }
+			.take(5)
+			.forEach { integrante => integrante.ascenderASubjefe() } 
+	}
+	
+	method soldadosVivos() {
+		return self.integrantesVivos().filter { integrante => integrante.esSoldado() }
+	}
+	
+	method elegirNuevoDon() {
+		don.subordinadoMasLeal().ascenderADonDe(self)
+	}
+	
+	method ascenderADon(unIntegrante) {
+		don = unIntegrante
+	}
+	
+	method aumentarLealtad() {
+		integrantes.forEach { integrante => integrante.aumentarLealtadPorLuto() }
 	}
 
 }
@@ -141,21 +197,29 @@ class Escopeta {
 
 class Don {
 
-	const subordinados = #{}
+	const property subordinados = #{}
 
 	method sabeDespacharElegantemente(unaPersona) {
 		return true
 	}
 
 	method atacar(unAtacante, unAtacado) {
-		subordinados.anyOne().atacar(unAtacado)
+		subordinados.anyOne().atacarIntegrante(unAtacado)
+	}
+	
+	method esSoldado() {
+		return false
+	}
+	
+	method subordinadoMasLeal() {
+		return subordinados.max { subordinado => subordinado.lealtad() }
 	}
 
 }
 
 class Subjefe {
 
-	const subordinados = #{}
+	const property subordinados = #{}
 
 	method sabeDespacharElegantemente(unaPersona) {
 		return subordinados.any{ subordinado => subordinado.tieneArmaSutil() }
@@ -163,6 +227,10 @@ class Subjefe {
 
 	method atacar(unAtacante, unAtacado) {
 		unAtacante.armaCualquiera().usarContra(unAtacado)
+	}
+
+	method esSoldado() {
+		return false
 	}
 
 }
@@ -175,6 +243,14 @@ class Soldado {
 
 	method atacar(unAtacante, unAtacado) {
 		unAtacante.armaMasCercana().usarContra(unAtacado)
+	}
+
+	method esSoldado() {
+		return true
+	}
+	
+	method subordinados() {
+		return #{}
 	}
 
 }
